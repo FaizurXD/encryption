@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from Crypto.Random import get_random_bytes
 
-SBOX_PATH = 'path_to_sbox_file'
+SBOX_PATH = 'sbox.txt'
 
 def load_sbox(filename):
     with open(filename, 'r') as file:
