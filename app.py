@@ -1,7 +1,13 @@
 from flask import Flask, render_template, request, send_file
 from faizurEncrypt import encrypt
+from datetime import datetime, timedelta
+import pytz
+import os
+import sched
+import time
 
 app = Flask(__name__)
+scheduler = sched.scheduler(time.time, time.sleep)
 
 html_template = """
 <!DOCTYPE html>
@@ -10,7 +16,7 @@ html_template = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faizur Encryptor</title>
+    <title>Encryptor</title>
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -97,6 +103,23 @@ html_template = """
 </html>
 """
 
+def get_timestamp():
+    ist = pytz.timezone('Asia/Kolkata')  # Indian Standard Time
+    now = datetime.now(ist)
+    return now.strftime("%Y-%m-%d_%H-%M-%S")
+
+def delete_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"Deleted file: {file_path}")
+    else:
+        print(f"File does not exist: {file_path}")
+
+def schedule_file_deletion(file_path):
+    deletion_time = datetime.now() + timedelta(minutes=10)
+    deletion_timestamp = deletion_time.timestamp()
+    scheduler.enterabs(deletion_timestamp, 1, delete_file, (file_path,))
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     input_text = None
@@ -106,14 +129,21 @@ def home():
         input_text = request.form['input_text']
         output = encrypt(input_text)
 
-        with open("encrypted.txt", "w") as text_file:
+        file_name = f"encrypted-{get_timestamp()}.txt"
+        file_path = os.path.join(app.root_path, file_name)
+        with open(file_path, "w") as text_file:
             text_file.write(output)
+
+        schedule_file_deletion(file_path)
 
     return render_template_string(html_template, input_text=input_text, output=output)
 
 @app.route('/download')
 def download_file():
-    return send_file('encrypted.txt', as_attachment=True)
+    file_name = f"encrypted-{get_timestamp()}.txt"
+    file_path = os.path.join(app.root_path, file_name)
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
+    scheduler.run()
