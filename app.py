@@ -1,5 +1,4 @@
 from flask import Flask, render_template_string, request, send_file
-from fse import encrypt, load_sbox
 import os
 import hashlib
 from Crypto.Cipher import AES
@@ -10,21 +9,26 @@ app = Flask(__name__)
 # Set background image
 bg_image = "bg.png"
 
-# Encryption logic from fse.py
-def load_sbox(filename):
-    with open(filename, 'r') as file:
-        lines = file.read().split()
-        return lines
+# Load S-box
+def load_sbox():
+    sbox = []
+    with open('sbox.txt', 'r') as file:
+        for line in file:
+            sbox.append(line.strip())
+    return sbox
 
+# FSE512 substitution
 def fse512_substitution(data, sbox):
     hex_data = data.hex()
     return ''.join(sbox[int(hex_data[i:i+2], 16) % len(sbox)] for i in range(0, len(hex_data), 2))
 
+# AES encryption
 def aes_encrypt(data, key):
     cipher = AES.new(key, AES.MODE_ECB)
     data_padded = pad(data, AES.block_size)
     return cipher.encrypt(data_padded)
 
+# Encrypt function
 def encrypt(data, sbox):
     sha256_hash = hashlib.sha256(data.encode()).digest()
     md5_hash = hashlib.md5(sha256_hash).digest()
@@ -116,7 +120,7 @@ def index():
     plaintext = None
     if request.method == 'POST':
         plaintext = request.form['plaintext']
-        sbox = load_sbox('sbox.txt')  # Ensure 'sbox.txt' is in the same directory
+        sbox = load_sbox()
         encrypted_text = encrypt(plaintext, sbox)
         
         # Write encrypted text to file
