@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template_string, request, send_file
 from faizurEncrypt import encrypt
 from datetime import datetime, timedelta
 import pytz
@@ -22,7 +22,7 @@ html_template = """
     <!-- Custom CSS -->
     <style>
         body {
-            background-image: url("bg.png");
+            background-image: url("https://raw.githubusercontent.com/FaizurXD/encryption/main/blue-landscape%20(1)%20(1).png");
             background-size: cover;
             font-family: Arial, sans-serif;
         }
@@ -147,8 +147,13 @@ def home():
 
 @app.route('/download')
 def download_file():
+    encrypted_text = request.args.get('encrypted_text')
     file_name = f"encrypted-{get_timestamp()}.txt"
     file_path = os.path.join(app.root_path, file_name)
+    with open(file_path, "w") as text_file:
+        text_file.write(encrypted_text)
+    
+    schedule_file_deletion(file_path)
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
