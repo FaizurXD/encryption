@@ -46,6 +46,13 @@ html_template = """
 
         .btn-primary {
             border-radius: 5px;
+            background-color: #007bff; /* Adjusted button color */
+            border-color: #007bff; /* Adjusted button border color */
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3; /* Adjusted button hover color */
+            border-color: #0056b3; /* Adjusted button hover border color */
         }
 
         .response {
@@ -68,7 +75,7 @@ html_template = """
 
 <body>
     <div class="container">
-        <h1 class="mb-4">Encryptor</h1>
+        <h1 class="mb-4">Faizur Encryptor</h1>
         <form method="POST" action="/">
             <div class="form-group">
                 <label for="input_text">Enter your plaintext:</label>
@@ -145,5 +152,5 @@ def download_file():
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
     scheduler.run()
