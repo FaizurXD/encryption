@@ -20,60 +20,11 @@ html_template = """
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <style>
-        body {
-            background-image: url("https://raw.githubusercontent.com/FaizurXD/encryption/main/bg.png");
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.7); /* semi-transparent white */
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-control {
-            border-radius: 5px;
-        }
-
-        .btn-primary {
-            border-radius: 5px;
-            background-color: #007bff; /* Adjusted button color */
-            border-color: #007bff; /* Adjusted button border color */
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3; /* Adjusted button hover color */
-            border-color: #0056b3; /* Adjusted button hover border color */
-        }
-
-        .response {
-            margin-top: 20px;
-        }
-
-        .output {
-            background-color: #D1FFBD;
-            color: #000000;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-
-        .download-btn {
-            margin-top: 10px;
-        }
-    </style>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
 </head>
 
 <body>
+    <div class="snowflakes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="container">
         <h1 class="mb-4">Faizur Encryptor</h1>
         <form method="POST" action="/">
