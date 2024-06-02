@@ -22,7 +22,7 @@ html_template = """
     <!-- Custom CSS -->
     <style>
         body {
-            background-image: url("https://raw.githubusercontent.com/FaizurXD/encryption/main/blue-landscape%20(1)%20(1).png");
+            background-image: url("https://raw.githubusercontent.com/FaizurXD/encryption/main/bg.png");
             background-size: cover;
             font-family: Arial, sans-serif;
         }
