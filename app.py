@@ -1,9 +1,14 @@
-from flask import Flask, render_template_string, request
+from flask import Flask, render_template_string, request, send_file
+from fse import encrypt, load_sbox
+import os
+import hashlib
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-import hashlib
 
 app = Flask(__name__)
+
+# Set background image
+bg_image = "bg.png"
 
 # Encryption logic from fse.py
 def load_sbox(filename):
@@ -37,10 +42,10 @@ html_template = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Encryption</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #343a40;
+            background-image: url('{{ bg_image }}');
+            background-size: cover;
             font-family: Arial, sans-serif;
             color: #ffffff;
         }
@@ -48,7 +53,7 @@ html_template = """
             max-width: 600px;
             margin: 50px auto;
             padding: 20px;
-            background-color: #495057;
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
@@ -63,9 +68,10 @@ html_template = """
         }
         .response {
             margin-top: 20px;
+            color: #ffffff;
         }
         .output {
-            background-color: #D1FFBD;
+            background-color: rgba(255, 255, 255, 0.7);
             color: #000000;
             padding: 10px;
             border-radius: 5px;
@@ -76,7 +82,7 @@ html_template = """
 <body>
     <div class="container">
         <h1 class="mb-4">Custom Encryption</h1>
-        <form method="POST" action="/">
+        <form method="POST" action="/" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="plaintext">Enter your plaintext:</label>
                 <input type="text" class="form-control" id="plaintext" name="plaintext" required>
@@ -91,14 +97,15 @@ html_template = """
             <div class="output">
                 <h3>Encrypted text:</h3>
                 <p>{{ encrypted_text }}</p>
+                <form method="get" action="/download">
+                    <input type="hidden" name="encrypted_text" value="{{ encrypted_text }}">
+                    <button type="submit" class="btn btn-primary">Download Encrypted Text</button>
+                </form>
             </div>
             {% endif %}
         </div>
         {% endif %}
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
 """
@@ -111,7 +118,26 @@ def index():
         plaintext = request.form['plaintext']
         sbox = load_sbox('sbox.txt')  # Ensure 'sbox.txt' is in the same directory
         encrypted_text = encrypt(plaintext, sbox)
-    return render_template_string(html_template, encrypted_text=encrypted_text, plaintext=plaintext)
+        
+        # Write encrypted text to file
+        with open('encrypted.txt', 'w') as f:
+            f.write(encrypted_text)
+        
+        # Schedule deletion of the file after 30 minutes
+        os.system("echo 'sleep 1800 && rm encrypted.txt' | at now")
+
+    return render_template_string(html_template, encrypted_text=encrypted_text, plaintext=plaintext, bg_image=bg_image)
+
+@app.route('/download', methods=['GET'])
+def download():
+    encrypted_text = request.args.get('encrypted_text')
+    
+    # Write encrypted text to file
+    with open('encrypted.txt', 'w') as f:
+        f.write(encrypted_text)
+    
+    # Send file for download
+    return send_file('encrypted.txt', as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
